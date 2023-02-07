@@ -183,7 +183,7 @@ exports.postPayment = async (req, res) => {
             "name": product.id,
             "description": product.product_type
           },
-          "unit_amount": product.amount
+          "unit_amount": product.amount*100 //100
         },
         "quantity": 1
       }],
