@@ -21,6 +21,11 @@ app.post(
     [authJwt.verifyToken, authJwt.isDriver],
     controller.updateOrder
 );
+app.post(
+  "/api/driver/location",
+  [authJwt.verifyToken, authJwt.isDriver],
+  controller.location
+);
 
 
 }

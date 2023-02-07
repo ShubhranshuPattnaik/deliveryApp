@@ -30,6 +30,12 @@ module.exports = (sequelize, Sequelize) => {
       drop:{
         type: Sequelize.STRING
       },
+      latitude:{
+        type: Sequelize.FLOAT
+      },
+      longitude:{
+        type: Sequelize.FLOAT
+      },
       status:{
         type: Sequelize.STRING
       },
@@ -41,10 +47,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       rating:{
         type: Sequelize.INTEGER
-       }
-      // review:{
-      //   type: Sequelize.STRING
-      // } 
+       },
+      review:{
+        type: Sequelize.STRING
+      } 
   
     });
   

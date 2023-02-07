@@ -12,6 +12,8 @@ const { product, Sequelize } = require("../models");
 const { PhoneNumber } = require("plivo/dist/resources/numbers");
 const Coupon = db.coupon;
 
+const axios = require('axios');
+var NodeGeocoder = require('node-geocoder');
 
 var Publishable_Key = 'pk_test_51MYMrQSAG3bWCL5SXWYyw66rrN6IpsttcdND462YInSb95Yp9X8Yr3WpAIPEJOtFTiZ71loB5l3A5pGNuT0rSn5400rmsuzNni'
 var Secret_Key = 'sk_test_51MYMrQSAG3bWCL5SEZ5Wkm1OlWS3Ki2ZC6v6xFEjGUNJgKsHnY7LRwPhYLVPHAZGvSJlKImtuaOedP1eugU1ev7x002rNpISiv'
@@ -44,6 +46,29 @@ exports.userBoard = async (req, res) => {
     phoneNumber: req.body.phoneNumber,
     alternateNumber: req.body.alternateNumber
   });
+
+
+
+  var geocoder = NodeGeocoder({
+    provider: 'opencage',
+    apiKey: '383a76e0784f4ae5b7bee19f0b4dd004'
+  });
+  
+  const location = await geocoder.geocode(product.pickup, function(err, res) {
+    const res1 = res[0];
+    return res1;
+  });
+  let cords = location[0];
+  let latitude = cords.latitude;
+  let longitude = cords.longitude;
+
+  product.update({
+      latitude: latitude,
+      longitude: longitude
+  });
+  
+  
+
   amount = product.weight*product.length*product.breadth;
    if(req.body.coupon === null){
     product.update({amount: amount});
@@ -112,7 +137,7 @@ exports.orderStatus = async (req, res) => {
 
       res.status(200).send("Your order has been delivered, please rate the driver.")
     }
-    //res.redirect(feedback)
+    //res.redirect(/feedback)
     else{
     res.status(200).send({trackingId:trackingId, status:status});
     console.log(status);

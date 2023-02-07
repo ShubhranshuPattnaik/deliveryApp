@@ -106,4 +106,38 @@ exports.jobAssigned = async (req, res) => {
    res.status(500).send({message: "error.message"});
   }
   };
+  exports.location = async (req, res) => {
+    try{ 
+        let token = req.session.token;
+    
+        const id = jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({
+            message: "Unauthorized!",
+        });
+      }
+      const uid = req.userId = decoded.id;
+      return uid;
+    });   
+          
+    const driver = await Driver.findOne({
+        where: {
+            driverId: id
+        }
+    });
+
+    driver.update({
+        latitude: req.body.latitude,
+        longitude: req.body.longitude
+
+    });
+
+        res.status(200).send("location updated");
+
+
+    
+    } catch{
+   res.status(500).send({message: "error.message"});
+  }
+  };
 

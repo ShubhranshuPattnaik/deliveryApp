@@ -41,4 +41,12 @@ app.post(
   controller.coupons
 );
 
+app.post(
+  '/api/admin/finddriver=nearest',
+  [authJwt.verifyToken,authJwt.isAdmin,authJwt.isUserOrAdmin],
+  controller.nearestDriver
+);
+
+
+
 };

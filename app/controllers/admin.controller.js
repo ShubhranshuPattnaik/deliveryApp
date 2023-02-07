@@ -100,6 +100,10 @@ exports.driverRequests = async (req, res) => {
             });
             res.status(200).send(driver);
         }
+
+
+
+
         }catch{
             res.status(500).send({message: "error.message"});
         }        
@@ -119,24 +123,99 @@ exports.manageRequests = async (req,res) => {
             }
         });
 
-        const driver = await Driver.findOne({
-            where:{
-                driverId: req.body.driverId
-            }
-        });
+        // const driver = await Driver.findOne({
+        //     where:{
+        //         driverId: req.body.driverId
+        //     }
+        // });
 
 
         product.update({
             status: "accepted",
-            driverId: req.body.driverId
+            //driverId: req.body.driverId
         });
 
-        driver.update({
-            status: "assigned",
-            productId: req.body.productId
-        });
-        res.status(200).send("Job has been assigned");
+        // driver.update({
+        //     status: "assigned",
+        //     productId: req.body.productId
+        // });
+
+        if(req.body.mode === "manual"){
+
+                const driver = await Driver.findOne({
+                    where:{
+                        driverId: req.body.driverId
+                    }
+                });
+                const product = await Product.findOne({
+                    where:{
+                        id: req.body.productId
+                    }
+                });
+        
+                product.update({
+                    driverId: req.body.driverId
+                });
+        
+                driver.update({
+                    status: "assigned",
+                    productId: req.body.productId
+                });
+        
+                res.status(200).send({
+                    
+                    driver: driver, message:"Job Assigned"
+                });
+                
+              }
+              else if(req.body.mode === "auto"){
+            //   const minValue = await Driver.min('distance');
+            //   console.log(minValue);
+            //   const driver = await Driver.findAll({
+            //                 where:{
+            //                     distance: {
+            //                         [Sequelize.Op.between]: [0, 1]
+            //                       }
+            //                 }
+            //   });
+
+             const driver = await Driver.findOne({
+                order: [
+                  ['distance', 'ASC']
+                ]});
+            //   }).then((result) => {
+            //     console.log(`id: ${result.id}`);
+            //   });
+              //console.log(driver);
+
+              const data =driver.dataValues;
+              console.log(data);
+        
+
+              const nearDriver = await Driver.findOne({
+                where:{
+                    driverId: data.driverId
+                }
+            });
+
+            const product = await Product.findOne({
+                where:{
+                    id: req.body.productId
+                }
+            });
+
+            product.update({
+                driverId: data.driverId
+            });
+
+            nearDriver.update({
+                status: "assigned",
+                productId: req.body.productId
+            });
+
+            res.status(200).send({driver: nearDriver, message:"Job Assigned"})
     }
+}
     else{
         product.update({
             status: "rejected"
@@ -144,6 +223,7 @@ exports.manageRequests = async (req,res) => {
         res.status(200).send("Job has been rejected");
 
     }
+
 }catch{
 
     res.status(500).send({message:"error.message"});
@@ -193,3 +273,110 @@ exports.coupons = async (req, res) => {
         }        
 };
   
+
+exports.nearestDriver = async (req, res) => {
+    
+    try{
+
+        const product = await Product.findOne({
+            where:{
+                id: req.body.productId
+            }
+        });
+
+        let productLatitude = product.latitude;
+        let productLongitude = product.longitude;
+
+        const count = Driver.count().then(count => {
+
+        });
+        
+
+        for(let i = 1; i<=count; i++){ 
+
+            const driver = await Driver.findOne({
+                where:{
+                    id: i
+                }
+            });
+          
+     
+            let driverLatitude = driver.latitude;
+            let driverLongitude = driver.longitude;
+
+            let x = productLatitude-driverLatitude;
+            x = (x**2);
+            let y = productLongitude-driverLongitude;
+            y = (y**2);
+            let distance = (x+y);
+            distance = Math.sqrt(distance);
+
+            driver.update({
+                distance: distance
+            });
+          
+       }
+
+       const driver = await Driver.findAll({
+            
+        attributes: {exclude:['id','createdAt','updatedAt','latitude','longitude','status','avgRating','productId']}
+        
+     });
+     //if(req.body.mode === "spectate"){
+       res.status(200).send(driver);
+    // }
+    //   if(req.body.mode === "manual"){
+
+    //     const driver = await Driver.findOne({
+    //         where:{
+    //             driverId: req.body.driverId
+    //         }
+    //     });
+    //     const product = await Product.findOne({
+    //         where:{
+    //             id: req.body.productId
+    //         }
+    //     });
+
+    //     product.update({
+    //         driverId: req.body.driverId
+    //     });
+
+    //     driver.update({
+    //         status: "assigned",
+    //         productId: req.body.productId
+    //     });
+
+    //     res.status(200).send({
+    //         driver:driver,
+    //         message: "Job Assigned"
+    //     });
+        
+    //   }
+    //   const minValue = await Driver.min('distance');
+    //   console.log(minValue);
+
+    //  if(req.body.mode === "auto"){
+        
+        
+    //     const driver = await Driver.findOne({
+    //             where:{
+                    
+    //                 distance : 0.0147122
+    //             }
+                
+    //     });
+    //     console.log(minValue);
+    //    console.log(driver);
+    //    //res.status(200).send(nearestDriver);
+        
+
+    // }
+
+
+        }catch{
+            res.status(500).send({message: "error.message"});
+        }        
+};
+
+

@@ -6,8 +6,11 @@ module.exports = (sequelize, Sequelize) => {
       driverId:{
         type: Sequelize.INTEGER
       },
-      location: {
-        type: Sequelize.STRING
+      latitude: {
+        type: Sequelize.FLOAT
+      },
+      longitude: {
+        type: Sequelize.FLOAT
       },
       status: {
         type: Sequelize.STRING
@@ -17,8 +20,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       avgRating: {
         type: Sequelize.FLOAT
-      }
-  
+      },
+      distance: {
+        type: Sequelize.FLOAT
+      }  
     });
   
     return Driver;
