@@ -12,6 +12,10 @@ const { product, Sequelize } = require("../models");
 const { PhoneNumber } = require("plivo/dist/resources/numbers");
 const Coupon = db.coupon;
 
+
+const plivo = require('plivo');
+const client = new plivo.Client();
+
 const axios = require('axios');
 var NodeGeocoder = require('node-geocoder');
 
@@ -201,7 +205,15 @@ exports.postPayment = async (req, res) => {
       paymentStatus: "Paid"
             
     });
-    res.status(200).send("Your order has been placed.");
+    const phoneNumber =  product.phoneNumber;
+    console.log(phoneNumber);
+    const link = session.url;
+    res.status(200).send({Payment_link:session.url});
+      client.messages.create({
+      src: '+919876802979',
+      dst: "+91"+`${phoneNumber}`,
+      text: 'Payment link for orderId: ' + `${product.id}` + '-' +  `${link}`
+  });
     
 }catch{
   product.update({
