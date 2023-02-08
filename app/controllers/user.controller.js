@@ -86,10 +86,12 @@ exports.userBoard = async (req, res) => {
   
   if(coupon){
 
-  amount = amount - coupon.amount
+  finalAmount = amount - coupon.amount
 
   product.update({amount: amount});
-  res.status(200).send({Amount: amount,
+  res.status(200).send({Total_Amount: amount,
+    Discount: coupon.amount,
+    Final_Amount: finalAmount,
     Next: "Details Saved, please proceed to payment"
   });
 }
