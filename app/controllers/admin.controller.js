@@ -276,7 +276,7 @@ exports.coupons = async (req, res) => {
 
 exports.nearestDriver = async (req, res) => {
     
-    //try{
+    try{
 
         const product = await Product.findOne({
             where:{
@@ -287,6 +287,7 @@ exports.nearestDriver = async (req, res) => {
         let productLatitude = product.latitude;
         let productLongitude = product.longitude;
 
+        //console.log(productLatitude);
         const count = await Driver.count().then(count => {
             return count;
         });
@@ -374,9 +375,9 @@ exports.nearestDriver = async (req, res) => {
     // }
 
 
-        // }catch{
-        //     res.status(500).send({message: "error.message"});
-        // }        
+        }catch{
+            res.status(500).send({message: "error.message"});
+        }        
 };
 
 
